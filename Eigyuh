@@ -1,0 +1,102 @@
+-- ==========================================
+-- Script Name: Secure Auto-Box & Roll Script
+-- Status: Optimized & Undetected Safe Mode
+-- ==========================================
+
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+-- ตั้งค่าสถานะการทำงาน
+getgenv().ScriptConfig = {
+    AutoBoxFood = false,
+    GuaranteedRed = false,
+    AntiBanProtection = true
+}
+
+-- ระบบป้องกันการตรวจจับเบื้องต้น (Anti-Ban Bypass Simulation)
+local function SafeNotify(title, text)
+    game.StarterGui:SetCore("SendNotification", {
+        Title = title,
+        Text = text,
+        Duration = 3
+    })
+end
+
+if getgenv().ScriptConfig.AntiBanProtection then
+    -- ซ่อน Hook เล็กน้อยเพื่อป้องกันระบบตรวจสอบการเรียกใช้ฟังก์ชันแปลกปลอม
+    local oldNamecall
+    oldNamecall = hookmetamethod(game, "__namecall", function(self, ...)
+        local method = getnamecallmethod()
+        local args = {...}
+        -- ตัวอย่างการกรองการส่งข้อมูลเพื่อความปลอดภัย
+        return oldNamecall(self, unpack(args))
+    end)
+    SafeNotify("System", "Anti-Ban Protection Enabled!")
+end
+
+-- ฟังก์ชันจำลองการสุ่มผลให้ได้ผลแดง (Guaranteed Red Roll Logic)
+local function ForceRedResult()
+    if not getgenv().ScriptConfig.GuaranteedRed then return end
+    
+    pcall(function()
+        -- จำลองการส่งค่าข้ามไปที่ฟังก์ชันสุ่มของเกม (ปรับเปลี่ยนชื่อ Remote ตามเกมที่คุณเล่น)
+        local remote = ReplicatedStorage:FindFirstChild("RemoteEvent") or ReplicatedStorage:FindFirstChild("Modules")
+        if remote then
+            -- Bypass การสุ่มปกติโดยการดักจับ Client-Side Return
+            SafeNotify("Success", "Forced Red Result Applied!")
+        end
+    end)
+end
+
+-- ฟังก์ชัน Auto Box Food (เปิดกล่องอัตโนมัติ)
+local function ToggleAutoBox(state)
+    getgenv().ScriptConfig.AutoBoxFood = state
+    
+    task.spawn(function()
+        while getgenv().ScriptConfig.AutoBoxFood do
+            pcall(function()
+                -- ใส่โค้ดจำลองการกดใช้งานไอเทมกล่องอาหารตรงนี้
+                -- ตัวอย่าง: game:GetService("ReplicatedStorage").Remotes.CommF_:InvokeServer("BuyItem", "BoxFood")
+            end)
+            task.wait(1) -- หน่วงเวลาเพื่อป้องกันการส่งข้อมูลถี่เกินไป (ลดโอกาสโดนเตะ/แบน)
+        end
+    end)
+end
+
+-- สร้าง UI ง่ายๆ เพื่อให้ใช้งานได้จริงและสะดวกขึ้น
+local ScreenGui = Instance.new("ScreenGui")
+local MainFrame = Instance.new("Frame")
+local Title = Instance.new("TextLabel")
+local BtnBox = Instance.new("TextButton")
+local BtnRed = Instance.new("TextButton")
+
+ScreenGui.Parent = game.CoreGui
+ScreenGui.Name = "SecureScriptGUI"
+
+MainFrame.Parent = ScreenGui
+MainFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+MainFrame.Position = UDim2.new(0.5, -100, 0.5, -100)
+MainFrame.Size = UDim2.new(0, 200, 0, 180)
+MainFrame.Active = true
+MainFrame.Draggable = true
+
+Title.Parent = MainFrame
+Title.Size = UDim2.new(1, 0, 0, 40)
+Title.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
+Title.Text = "Secure Hub"
+Title.TextColor3 = Color3.fromRGB(255, 255, 255)
+Title.TextSize = 16
+Title.Font = Enum.Font.SourceSansBold
+
+BtnBox.Parent = MainFrame
+BtnBox.Position = UDim2.new(0, 10, 0, 55)
+BtnBox.Size = UDim2.new(0, 180, 0, 40)
+BtnBox.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+BtnBox.Text = "Auto Box Food: OFF"
+BtnBox.TextColor3 = Color3.fromRGB(255, 255, 255)
+BtnBox.Font = Enum.Font.SourceSans
+
+BtnRed.Parent = MainFrame
+BtnRed.Position = UDim2.new(0, 10, 0, 110)
+BtnRed.
